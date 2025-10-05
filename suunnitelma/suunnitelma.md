@@ -1,51 +1,50 @@
 # Harjoitustyön suunnitelma
 
-(Täydennä oman pelisi tiedot tähän tiedostoon muokkaamalla 
-tiedostoa tekstieditorissa. Käytä [Markdown-syntaksia](https://about.gitlab.com/handbook/markdown-guide/).
-Poista sitten *kaikki* suluilla merkityt kohdat.)
+## Tietoja
 
-## Tietoja 
+Tekijä: Jaakko Pakarinen
 
-Tekijä: (Etunimi Sukunimi)
+Työ git-varaston osoite: https://github.com/econjp/ohj1ht
 
-Työ git-varaston osoite: <https://gitlab.jyu.fi/anlakane/ohj1ht> (*Korvaa* tämä osoite oman git-varastosi osoitteella)
+Pelin nimi: FIVA: Short Watch
 
-Pelin nimi: (Nimi)
+Pelialusta: Windows
 
-Pelialusta: Windows/macOS/Linux (Valitse alusta)
-
-Pelaajien lukumäärä: 1/2/3/4 (Valitse pelaajien lukumäärä)
+Pelaajien lukumäärä: 1
 
 ## Pelin tarina
 
-(Pelin tarina.)
+Ei ole peli, vaan pieni tietojenkäsittelyohjelma. Ohjelma seuraa Finanssivalvonnan sivuilta julkisesti näkyviä shorttipositioita eli lyhyitä positioita suomalaisissa pörssiyhtiöissä. Sivusto julkaisee joka päivä klo 10 päivityksen aktiivisista positioista. Ajatus on harjoitella datan käsittelyä ja tiedon poimimista HTML-sivulta C#:n avulla.
 
 ## Pelin idea ja tavoitteet
 
-(Pelin idea ja tavoitteet.)
+Tavoitteena on tehdä ohjelma, joka lukee paikallisen HTML-tiedoston (esimerkiksi tallennettu versio Finanssivalvonnan shorttipositiot-sivusta) ja poimii siitä taulukon tiedot. Ohjelma tulostaa siistissä muodossa listauksen, jossa nähdään ilmoitusvelvollinen, kohdeyhtiö, prosenttiosuus ja päivämäärä. Lisäksi ohjelma laskee, kuinka monta eri yhtiötä on shortattuna ja mikä on suurin yksittäinen positio. Tarkoitus on opetella lukemaan ja käsittelemään tekstitietoa, käyttämään eri taulukoita ja silmukoita, ja tuottamaan yhteenveto.
 
 ## Hahmotelma pelistä
 
-(Kun olet lisännyt suunnitelmakuvan tähän hakemistoon, linkitä se tähän alle. Alla on esimerkkikuvan linkitys.)
+Ohjelma on komentorivipohjainen. Käyttäjä suorittaa ohjelman, joka lukee tiedoston, käsittelee rivit ja tulostaa raportin. Näytöllä näkyy esimerkiksi:
 
-![Esimerkkikuva](esimerkkikuva.png "Esimerkkikuva")
+Shorttipositioita yhteensä: 28  
+Suurin positio: 1.22 % (Qube Research \& Technologies / QT Group Oyj)
+
+
 
 ## Toteutuksen suunnitelma
 
-Helmikuu
+Lokakuu
 
-- (Tavoite 1)
-- (Tavoite 2)
-- (Tavoite 3)
+* Ladataan ja tallennetaan esimerkkisivu (HTML) omalle koneelle
+* Rakennetaan tiedostonlukija ja perusrakenne ohjelmalle
+* Parsitaan taulukon rivit ja tallennetaan tiedot listaan
+* Tulostetaan ensimmäinen raakaversio tiedoista
 
-Maaliskuu
+Loppu lokakuu
 
-- (Tavoite 1)
-- (Tavoite 2)
-- (Tavoite 3)
+* Lisätään funktio, joka laskee suurimman position ja määrän
+* Siistitään tuloste ja lisätään virhetarkistukset
+* Testataan eri HTML-versioilla
 
 Jos aikaa jää
 
-- (Tavoite 1)
-- (Tavoite 2)
-- (Tavoite 3)
+* Lisätään ominaisuus, joka vertailee kahden päivän dataa ja kertoo, mitkä positiot ovat kasvaneet tai pienentyneet
+* Kirjoitetaan lyhyt selostus ohjelman rakenteesta ja testauksesta
