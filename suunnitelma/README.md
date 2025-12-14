@@ -4,8 +4,8 @@ Tässä kansiossa on harjoitustyön suunnitelma ja kuvat.
 
 ## Suunnitelma
 
- [suunnitelma.md](suunnitelma.md).
+ [suunnitelma.md](suunnitelma.md)
 
-## Kuva / kuvat
+## Kuva
 
-([esimerkkikuva.png](esimerkkikuva.png)). 
+[hahmotelma.png](https://github.com/econjp/ohj1ht/blob/master/suunnitelma/hahmotelma.png)
