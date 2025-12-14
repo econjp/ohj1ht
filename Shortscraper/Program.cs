@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
@@ -18,22 +18,25 @@ public class Program
     /// Pääohjelma: koostaa lomakepyynnön (POST), lukee JSON-vastauksen,
     /// tulostaa rivit ja etsi samalla suurimman prosenttiosuuden.
     /// </summary>
+    private const string Url = "https://www.finanssivalvonta.fi/api/shortselling/datatable/current";
+    private const int MaxRivit = 1000;
     
     public static void Main()
     {
+        
         Console.OutputEncoding = Encoding.UTF8; // ääkköset konsoliin
 
         Console.WriteLine("Haetaan Fivan shorttipositiot...\n");
 
         // 1) Valmistellaan pyyntö DataTables API
-        var url = "https://www.finanssivalvonta.fi/api/shortselling/datatable/current";
+        var url = Url;
 
         // Form data application, urlencoded
         var form = new Dictionary<string, string>();
 
         // Haetaan alkaen rivistä 0 ja tarpeeksi pitkä "sivu" (esim. 1000 riittää nykydatalle)
         form["start"] = "0";
-        form["length"] = "1000";
+        form["length"] = MaxRivit.ToString();
 
         // Hakukenttä jätetään tyhjäksi = ei suodatusta
         form["search[value]"] = "";
@@ -125,6 +128,49 @@ public class Program
                 Console.WriteLine("Suurin positio: " +
                                   suurin.ToString("0.##") + "% (" +
                                   suurinHolder + " / " + suurinIssuer + ")");
+            
+                
+                // menun lisäys (ohjelma myös jää päälle) 
+                while (true)
+                {
+                    NaytaMenu();
+                    string valinta = Console.ReadLine();
+
+                    if (valinta == "0")
+                        break;
+
+                    if (valinta == "1")
+                    { //näytä kaikki rivit uudelleen
+                        TulostaRivit(data.data);
+                    }
+                    else if (valinta == "2")
+                    {
+                        Position s = HaeSuurin(data.data);
+                        Console.WriteLine();
+                        Console.WriteLine("Suurin positio: " +
+                                          s.netShortPositionInPercent.ToString("0.##") + "% (" +
+                                          s.positionHolder + " / " + s.issuerName + ")");
+                    }
+                    else if (valinta == "3")
+                    { //kaikki positiot per firma yhteen.
+                        TulostaYhtioSummat(data.data);
+                    }
+                    else if (valinta == "4")
+                    {
+                        HaeYhtionRivit(data.data);
+                    }
+                    else if (valinta == "5")
+                    { //raportti CSV tiedostoon
+                        TallennaCsv(data.data);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Tuntematon valinta.");
+                    }
+                }
+
+                Console.WriteLine("Moi!");        
+
             }
         }
         catch (HttpRequestException ex)
@@ -135,7 +181,162 @@ public class Program
         {
             Console.WriteLine("Virhe: " + ex.Message);
         }
+        
+        
+        
+        
+        
+        
     }
+    
+    private static void NaytaMenu()
+    { //Menu
+        Console.WriteLine();
+        Console.WriteLine("Valitse toiminto:");
+        Console.WriteLine("1 = Näytä kaikki rivit");
+        Console.WriteLine("2 = Näytä suurin positio");
+        Console.WriteLine("3 = Yhtiökohtainen summa (%)");
+        Console.WriteLine("4 = Hae yhtiön shortit (hakusana)");
+        Console.WriteLine("5 = Tallenna CSV (report.csv)");
+        Console.WriteLine("0 = Lopeta");
+        Console.Write("> ");
+    }
+
+    private static void TulostaRivit(List<Position> rivit)
+    {
+        for (int i = 0; i < rivit.Count; i++)
+        {
+            Position r = rivit[i];
+            string pvm = MuotoilePvm(r.positionDate);
+
+            Console.WriteLine(
+                pvm + " | " +
+                r.issuerName + " | " +
+                r.positionHolder + " | " +
+                r.netShortPositionInPercent.ToString("0.##") + "%");
+        }
+    }
+
+    private static Position HaeSuurin(List<Position> rivit)
+    {
+        Position suurin = rivit[0];
+
+        for (int i = 1; i < rivit.Count; i++)
+        {
+            if (rivit[i].netShortPositionInPercent > suurin.netShortPositionInPercent)
+                suurin = rivit[i];
+        }
+
+        return suurin;
+    }
+
+    private static string MuotoilePvm(string pvm)
+    {
+        if (string.IsNullOrEmpty(pvm))
+            return "";
+
+        DateTime dt;
+        if (DateTime.TryParse(pvm, out dt))
+            return dt.ToString("dd.MM.yyyy");
+
+        return pvm;
+    }
+
+    
+    
+    private static void TulostaYhtioSummat(List<Position> rivit)
+    { //kaikki positiot per firma yhteen.
+        var summat = new Dictionary<string, double>();
+
+        for (int i = 0; i < rivit.Count; i++)
+        {
+            string y = rivit[i].issuerName;
+            double p = rivit[i].netShortPositionInPercent;
+
+            if (summat.ContainsKey(y))
+                summat[y] += p;
+            else
+                summat[y] = p;
+        }
+
+        Console.WriteLine();
+        Console.WriteLine("Yhtiökohtaiset shortit yhteensä (%):");
+
+        foreach (var pari in summat)
+        {
+            Console.WriteLine(pari.Key + " | " + pari.Value.ToString("0.##") + "%");
+        }
+    }
+    
+
+    
+    private static void HaeYhtionRivit(List<Position> rivit)
+    {
+        Console.Write("Anna yhtiön nimi (tai osa): ");
+        string haku = Console.ReadLine();
+
+        if (string.IsNullOrEmpty(haku))
+            return;
+
+        string h = haku.Trim().ToLower();
+
+        Console.WriteLine();
+        bool loytyi = false;
+
+        for (int i = 0; i < rivit.Count; i++)
+        {
+            if (rivit[i].issuerName != null &&
+                rivit[i].issuerName.ToLower().Contains(h))
+            {
+                loytyi = true;
+
+                Position r = rivit[i];
+                string pvm = MuotoilePvm(r.positionDate);
+
+                Console.WriteLine(
+                    pvm + " | " +
+                    r.issuerName + " | " +
+                    r.positionHolder + " | " +
+                    r.netShortPositionInPercent.ToString("0.##") + "%");
+            }
+        }
+
+        if (!loytyi)
+            Console.WriteLine("Ei osumia.");
+    }
+
+    
+    
+    
+    private static void TallennaCsv(List<Position> rivit)
+    {
+        string polku = "report.csv";
+
+        using (var sw = new System.IO.StreamWriter(polku, false, Encoding.UTF8))
+        {
+            sw.WriteLine("date;issuer;holder;percent;isin");
+
+            for (int i = 0; i < rivit.Count; i++)
+            {
+                Position r = rivit[i];
+                string pvm = MuotoilePvm(r.positionDate);
+
+                sw.WriteLine(
+                    pvm + ";" +
+                    r.issuerName + ";" +
+                    r.positionHolder + ";" +
+                    r.netShortPositionInPercent.ToString("0.##") + ";" +
+                    r.isinCode);
+                
+            }
+        }
+
+        Console.WriteLine("Tallennettu: " + polku);
+        Console.WriteLine("Polku: " + System.IO.Path.GetFullPath(polku));
+
+    }
+    
+    
 }
 
 
@@ -156,3 +357,7 @@ public class Position
     public double netShortPositionInPercent { get; set; }   
     public string positionDate { get; set; }                
 }
+
+
+
+
