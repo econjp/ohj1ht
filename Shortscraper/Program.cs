@@ -181,14 +181,12 @@ public class Program
         {
             Console.WriteLine("Virhe: " + ex.Message);
         }
-        
-        
-        
-        
-        
-        
     }
     
+    
+    /// <summary>
+    /// Tulostaa valikon käyttäjälle.
+    /// </summary>
     private static void NaytaMenu()
     { //Menu
         Console.WriteLine();
@@ -201,7 +199,12 @@ public class Program
         Console.WriteLine("0 = Lopeta");
         Console.Write("> ");
     }
-
+    
+    
+/// <summary>
+/// Tulostaa kaikki annetut shortit konsoliin.
+/// </summary>
+/// <param name="rivit">Lista positioriveistä</param>
     private static void TulostaRivit(List<Position> rivit)
     {
         for (int i = 0; i < rivit.Count; i++)
@@ -217,6 +220,12 @@ public class Program
         }
     }
 
+
+/// <summary>
+/// Palautus listasta suurimman shorttiposition prosenttiosuuden perusteella.
+/// </summary>
+/// <param name="rivit">Lista positioriveistä</param>
+/// <returns>Suurimman prosenttiosuuden sisältävä positiorivi</returns>
     private static Position HaeSuurin(List<Position> rivit)
     {
         Position suurin = rivit[0];
@@ -230,6 +239,12 @@ public class Program
         return suurin;
     }
 
+
+/// <summary>
+/// Muotoilee päivämäärän muotoon dd.MM.yyyy, jos mahdollista tulkita päivämääräksi
+/// </summary>
+/// <param name="pvm">Päivämäärä merkkijonona</param>
+/// <returns>Muotoiltu päivämäärä tai alkuperäinen teksti</returns>
     private static string MuotoilePvm(string pvm)
     {
         if (string.IsNullOrEmpty(pvm))
@@ -242,8 +257,10 @@ public class Program
         return pvm;
     }
 
-    
-    
+/// <summary>
+/// Laskee yhtiökohtaisen shorttien summan ja tulostaa konsoliin.
+/// </summary>
+/// <param name="rivit">Lista positioriveistä</param>
     private static void TulostaYhtioSummat(List<Position> rivit)
     { //kaikki positiot per firma yhteen.
         var summat = new Dictionary<string, double>();
@@ -267,9 +284,12 @@ public class Program
             Console.WriteLine(pari.Key + " | " + pari.Value.ToString("0.##") + "%");
         }
     }
-    
 
-    
+
+/// <summary>
+/// Kysyy hakusanan ja tulostaa kaikki rivit, joissa yhtiön nimi sisältää hakusanan.
+/// </summary>
+/// <param name="rivit">Lista positioriveistä</param>
     private static void HaeYhtionRivit(List<Position> rivit)
     {
         Console.Write("Anna yhtiön nimi (tai osa): ");
@@ -305,9 +325,11 @@ public class Program
             Console.WriteLine("Ei osumia.");
     }
 
-    
-    
-    
+
+/// <summary>
+/// Tallentaa shorttipositiot CSV-tiedostoon (report.csv).
+/// </summary>
+/// <param name="rivit">Lista positioriveistä</param>
     private static void TallennaCsv(List<Position> rivit)
     {
         string polku = "report.csv";
@@ -327,16 +349,11 @@ public class Program
                     r.positionHolder + ";" +
                     r.netShortPositionInPercent.ToString("0.##") + ";" +
                     r.isinCode);
-                
             }
         }
-
         Console.WriteLine("Tallennettu: " + polku);
         Console.WriteLine("Polku: " + System.IO.Path.GetFullPath(polku));
-
     }
-    
-    
 }
 
 
